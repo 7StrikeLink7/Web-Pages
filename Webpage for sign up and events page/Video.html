@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Big Buck Bunny Video Player</title>
+<link rel="stylesheet" href="Users.css">
+<style>
+#bunny {
+ 
+  left: 0px;
+  top: 0;
+  min-width: 40%;
+  min-height: 40%;
+}
+
+
+
+/* Add some content at the bottom of the video/page */
+.content {
+  bottom: 0;
+  background: rgba(255, 0, 0, 0.5);
+  color: #f1f1f1;
+  width: 100%;
+  padding: 10px;
+  opacity: 1.0;
+}
+
+
+
+.contentHidden {
+  bottom: 0;
+  background: rgba(255, 0, 0, 0.5);
+  color: #f1f1f1;
+  width: 100%;
+  padding: 10px;
+  opacity: 0.7;
+}
+
+/* Style the button used to pause/play the video */
+.button {
+  width: 100px;
+  font-size: 11px;
+  padding: 10px;
+  border: none;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: #ddd;
+  color: black;
+}
+
+
+
+</style>
+</head>
+
+
+<body> 
+<div class="header">
+    <button type='button'><a href='secret.php'>Back to Profile Page</a></button>
+    <h1>Big Buck Bunny: </h1>
+</div><br>
+
+<p> Video courtesy of <a href="https://www.bigbuckbunny.org/" target="_blank">Big Buck Bunny</a>. </p> 
+<p>To leave fullscreen mode, press the 'Esc' button.  </p>
+
+
+<video width="400" id="bunny">
+    <source src="Big_Buck_Bunny_extract.mp4" type="video/mp4"> 
+    <source src="Big_Buck_Bunny_extract.ogv" type="video/ogg">   
+    Your browser does not support HTML5 video.  
+</video> 
+
+
+ 
+
+<div class="content" onmouseover="highlight(this)" onmouseout="unhighlight(this)">
+
+    <div id="playback" >
+    <!--Play, pasue, reload, sound slider, video progress bar and fullscreen buttons-->
+    <button id="playPause" onclick="playPause()">play</button>  
+    <button id="reload">reload</button>
+    <img src = https://upload.wikimedia.org/wikipedia/commons/2/21/Speaker_Icon.svg alt="Speaker icon" style="width:20px;height:20px;">
+
+  
+    <input type="range" min="0" max="100" value="50" id="volumeOutput">
+    <progress id='progress-bar' min='0' max='100' value='0'>0% played</progress>
+    <a id= "videoTime"> 0/52</a>
+    <button onclick="openFullscreen()" type="button">fullScreen</button>
+    </div> <br> 
+
+
+    <!--playback speed. -->
+    <div id ="playSpeed">
+    <a id="reportSpeed">Playback speed = 1x</a>
+    <button onclick="setDoubleSpeed()" type="button">2x Speed</button> 
+    <button onclick="setNormalSpeed()" type="button">1x Speed</button> 
+    <button onclick="setHalfSpeed()" type="button">0.5x Speed</button><br> 
+    </div><br>
+
+    <!--Original video settings toggle-->
+    <div >
+    <button onclick="enableControls()" type="button" id="controls">Enable controls</button>     
+    </div>
+</div>
+    
+
+
+
+<script>//Script for each of the buttons
+
+    //Set up variable for video file
+    var player = document.getElementById("bunny");
+
+   //Progress bar for video play time
+    player.addEventListener('timeupdate', updateProgressBar, false); 
+
+     //Volume slider - adjust volume
+    var volumeOutput = document.getElementById("volumeOutput");
+    volumeOutput.oninput = function() {
+        player.volume = (volumeOutput.value / 100);
+    }
+
+    //Play and pause button. Changes when pressed
+    var playButton = document.getElementById("playPause");  
+    function playPause() {
+        if (player.paused) {
+            player.play();
+            playButton.innerHTML = "Pause";
+            move();
+        }else {
+            player.pause();
+            playButton.innerHTML = "Play";
+        }
+    }
+
+    //Reload video when button is clicked
+    document.getElementById("reload").onclick = function () {player.load();};   
+    
+    //These relate to the video playback speed, and displays the speed back to user
+    function getPlaySpeed() { 
+        document.getElementById("reportSpeed").innerHTML = " Playback speed = " + player.playbackRate + "x";
+    } 
+    function setHalfSpeed() { 
+        player.playbackRate = 0.5;
+        getPlaySpeed();
+    
+    } 
+    function setNormalSpeed() { 
+        player.playbackRate = 1;
+        getPlaySpeed();
+    } 
+
+    function setDoubleSpeed() { 
+        player.playbackRate = 2;
+        getPlaySpeed();
+    } 
+
+    //If for some reason you want to original controls back. Toggle button to have it on or off
+    var controlButton = document.getElementById("controls");  
+    function enableControls() {
+        if (player.controls == true) {
+            player.controls = false;
+            controlButton.innerHTML = "Enable Controls";
+            player.load();
+        }else {
+            player.controls = true;
+            controlButton.innerHTML = "Disable Controls";
+            player.load();
+        } 
+
+    }
+
+    //This is for the control bar. I made it out if the user moves away from the bar, and full opacity when hovered
+    function unhighlight(entity){
+        entity.className = "contentHidden";
+    }
+    function highlight(entity){
+        entity.className = "content";
+    }
+
+    //Open the video in FullScreen 
+    function openFullscreen() {
+        if (player.requestFullscreen) {
+            player.requestFullscreen();
+        } else if (player.webkitRequestFullscreen) { /* Safari */
+            player.webkitRequestFullscreen();
+        } else if (player.msRequestFullscreen) { /* IE11 */
+            player.msRequestFullscreen();
+    }
+}
+    //To update the progress bar, to mirror to time left of the video
+    function updateProgressBar() {
+        var progressBar = document.getElementById('progress-bar');
+        var percentage = Math.floor((100 / player.duration) * player.currentTime); //It becomes current time of video out of the duration of video
+        progressBar.value = percentage;
+        document.getElementById("videoTime").innerHTML = (Math.round(player.currentTime) + " / " + Math.round(player.duration));
+    }
+
+
+</script> 
+
+
+<div class="footer">
+    <p>&copy; 2020 Private Message Limited</p>
+</div>
+</body> 
+</html> 
